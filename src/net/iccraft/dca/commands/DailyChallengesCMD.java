@@ -31,8 +31,8 @@ public class DailyChallengesCMD implements CommandExecutor {
 			return true;
 		}
 		Player plPl = (Player) sender;
-		if (!plPl.getWorld().getName().contains("Survival")) {
-			plPl.sendMessage(prefix + "You can only finish challenges in the Survival worlds!");
+		if (DCAMain.isWorldBlacklisted(plPl.getWorld())) {
+			plPl.sendMessage(prefix + "This world is blacklisted from completing challenges!");
 			return true;
 		}
 		ChallengePlayer chalPl = core.getChallengePlayer(plPl.getUniqueId());

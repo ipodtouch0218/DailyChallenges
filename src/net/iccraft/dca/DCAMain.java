@@ -4,11 +4,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -18,8 +20,8 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerFishEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerFishEvent.State;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,13 +39,16 @@ public class DCAMain extends JavaPlugin {
 
 	private ArrayList<ChallengePlayer> challengePlayers = new ArrayList<ChallengePlayer>();
 	private static int dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR); 
+	private static List<String> blacklistedWorlds;
 	
 	@Override
 	public void onEnable() {
-		Bukkit.getPluginManager().registerEvents(new EventListeners(this), this);
-		getCommand("dailychallenges").setExecutor(new DailyChallengesCMD(this));
+		saveDefaultConfig();
+		loadBlacklistedWorlds();
 		loadRewards();
 		loadChallenges();
+		Bukkit.getPluginManager().registerEvents(new EventListeners(this), this);
+		getCommand("dailychallenges").setExecutor(new DailyChallengesCMD(this));
 		
 		Bukkit.getOnlinePlayers().forEach(pl -> challengePlayers.add(ChallengePlayer.loadFromFile(pl.getUniqueId(), 
 				new File(getDataFolder() + "/players/" + pl.getUniqueId().toString() + ".yml"))));
@@ -66,7 +71,7 @@ public class DCAMain extends JavaPlugin {
 			public void run() {
 				for (ChallengePlayer pl : challengePlayers) {
 					if (pl.getPlayer() == null) return;
-					if (!pl.getPlayer().getWorld().getName().contains("Survival")) continue;
+					if (isWorldBlacklisted(pl.getPlayer().getWorld())) continue;
 					if (pl.getFocusedChallenge() == -1) continue;
 					ChallengeData data = pl.getChallengeData().get(pl.getFocusedChallenge());
 					String name = ChatColor.GOLD + "" + ChatColor.BOLD + data.getChallenge().getDisplayName().replaceAll("%amount%", "" + data.getRequired());
@@ -92,11 +97,19 @@ public class DCAMain extends JavaPlugin {
 	
 	public static int getDayOfYear() { return dayOfYear; }
 	public ArrayList<ChallengePlayer> getAllChallengePlayers() { return challengePlayers; }
+	public List<String> getBlacklistedWorlds() { return blacklistedWorlds; }
+	public static boolean isWorldBlacklisted(World world) {
+		return blacklistedWorlds.contains(world.getName());
+	}
 	public ChallengePlayer getChallengePlayer(UUID uuid) {
 		for (ChallengePlayer chalPl : challengePlayers) {
 			if (chalPl.getUniqueId().equals(uuid)) return chalPl;
 		}
 		return null;
+	}
+	
+	private void loadBlacklistedWorlds() {
+		blacklistedWorlds = getConfig().getStringList("blacklisted-worlds");
 	}
 	
 	private void loadRewards() {
@@ -118,7 +131,6 @@ public class DCAMain extends JavaPlugin {
 			private final Material[] crops = new Material[]{Material.LEGACY_CROPS, Material.LEGACY_BEETROOT_BLOCK, Material.POTATO, Material.CARROT, 
 					Material.LEGACY_NETHER_WARTS, Material.COCOA};
 			
-			@SuppressWarnings("deprecation")
 			public int onBlockBreak(BlockBreakEvent e) {
 				if (!Arrays.asList(crops).contains(e.getBlock().getType())) return 0;
 				Material mat = e.getBlock().getType();
@@ -136,7 +148,6 @@ public class DCAMain extends JavaPlugin {
 		}).register("HARVEST_CROPS");
 		
 		new Challenge("Fish %amount% Fish", "Use a fishing rod and start fishing for fish.", new int[]{3,5,7,10}, new ChallengeHandler() {
-			@SuppressWarnings("deprecation")
 			public int onFishing(PlayerFishEvent e) {
 				if (e.getState() != State.CAUGHT_FISH) return 0;
 				ItemStack item = ((Item) e.getCaught()).getItemStack();

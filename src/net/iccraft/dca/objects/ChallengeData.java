@@ -5,6 +5,7 @@ import org.bukkit.Sound;
 
 import com.connorlinfoot.actionbarapi.ActionBarAPI;
 
+import net.iccraft.dca.DCAMain;
 import net.iccraft.dca.Utils;
 import net.iccraft.dca.challenges.Challenge;
 import net.iccraft.dca.challenges.ChallengePlayer;
@@ -34,7 +35,7 @@ public class ChallengeData {
 	public void setScore(int score) { this.score = score; }
 	public void addScore(int score, ChallengePlayer player) { 
 		if (score == 0) return;
-		if (!player.getPlayer().getWorld().getName().contains("Survival")) return;
+		if (DCAMain.isWorldBlacklisted(player.getPlayer().getWorld())) return;
 		this.score+=score; 
 		if (this.score >= required) {
 			this.score = required;
