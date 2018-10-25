@@ -16,6 +16,7 @@ import net.iccraft.dca.Utils;
 import net.iccraft.dca.challenges.ChallengePlayer;
 import net.iccraft.dca.objects.ChallengeData;
 
+@SuppressWarnings("deprecation")
 public class DailyChallengesCMD implements CommandExecutor {
 
 	public static final String prefix = "§6[§eChallenge§6] §7";
@@ -41,10 +42,10 @@ public class DailyChallengesCMD implements CommandExecutor {
 	}
 	
 	private int[] borderSlots = new int[]{0,1,2,3,5,6,7,8,36,37,38,39,40,41,42,43,44};
-	private ItemStack borderItem = Utils.buildItem(new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 15), " ");
+	private ItemStack borderItem = Utils.buildItem(new ItemStack(Material.LEGACY_STAINED_GLASS_PANE, 1, (short) 15), " ");
 	
 	private int[] innerSlots = new int[]{9,10,11,12,13,14,15,16,17,18,20,22,24,26,27,28,29,30,31,32,33,34,35};
-	private ItemStack innerItem = Utils.buildItem(new ItemStack(Material.STAINED_GLASS_PANE, 1, (short) 5), " ");
+	private ItemStack innerItem = Utils.buildItem(new ItemStack(Material.LEGACY_STAINED_GLASS_PANE, 1, (short) 5), " ");
 	
 	private String[] tips = new String[]{"Click on a Challenge's book to get Real-Time updates on that Challenge!",
 										 "Hover over a Challenge to check its Reward before completing it!",
@@ -79,7 +80,7 @@ public class DailyChallengesCMD implements CommandExecutor {
 			if (data.getScore()>=data.getRequired()) {
 				stack = Utils.buildItem(new ItemStack(Material.ENCHANTED_BOOK, 1), "&a" + name, lore);
 			} else {
-				stack = Utils.buildItem(new ItemStack(Material.BOOK_AND_QUILL, 1), "&c" + name, lore);
+				stack = Utils.buildItem(new ItemStack(Material.LEGACY_BOOK_AND_QUILL, 1), "&c" + name, lore);
 			}
 			
 			inv.addItem(stack);

@@ -20,13 +20,11 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerFishEvent.State;
-//import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.connorlinfoot.actionbarapi.ActionBarAPI;
 
-//import me.mrCookieSlime.ExoticGarden.ExoticGarden;
 import net.iccraft.dca.challenges.Challenge;
 import net.iccraft.dca.challenges.ChallengeHandler;
 import net.iccraft.dca.challenges.ChallengePlayer;
@@ -114,10 +112,11 @@ public class DCAMain extends JavaPlugin {
 		}).register("XP");
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void loadChallenges() {
 		new Challenge("Harvest %amount% Crops", "Harvest fully grown/ripe crops. Does not include Pumpkins, Melons, Chorus Fruit, etc.", new int[]{15,20,25}, new ChallengeHandler() {
-			private final Material[] crops = new Material[]{Material.CROPS, Material.BEETROOT_BLOCK, Material.POTATO, Material.CARROT, 
-					Material.NETHER_WARTS, Material.COCOA};
+			private final Material[] crops = new Material[]{Material.LEGACY_CROPS, Material.LEGACY_BEETROOT_BLOCK, Material.POTATO, Material.CARROT, 
+					Material.LEGACY_NETHER_WARTS, Material.COCOA};
 			
 			@SuppressWarnings("deprecation")
 			public int onBlockBreak(BlockBreakEvent e) {
@@ -126,8 +125,8 @@ public class DCAMain extends JavaPlugin {
 				byte data = e.getBlock().getData();
 				
 				switch (mat) {
-				case BEETROOT_BLOCK: if (data == 3) return 1;
-				case NETHER_WARTS: if (data == 3) return 1;
+				case LEGACY_BEETROOT_BLOCK: if (data == 3) return 1;
+				case LEGACY_NETHER_WARTS: if (data == 3) return 1;
 				case COCOA: if (data > 7) return 1;
 				
 				default: if (data == 7) return 1;
@@ -137,10 +136,11 @@ public class DCAMain extends JavaPlugin {
 		}).register("HARVEST_CROPS");
 		
 		new Challenge("Fish %amount% Fish", "Use a fishing rod and start fishing for fish.", new int[]{3,5,7,10}, new ChallengeHandler() {
+			@SuppressWarnings("deprecation")
 			public int onFishing(PlayerFishEvent e) {
 				if (e.getState() != State.CAUGHT_FISH) return 0;
 				ItemStack item = ((Item) e.getCaught()).getItemStack();
-				if (item.getType() == Material.RAW_FISH) {
+				if (item.getType() == Material.LEGACY_RAW_FISH) {
 					return 1;
 				}
 				return 0;
@@ -171,12 +171,6 @@ public class DCAMain extends JavaPlugin {
 				return 0;
 			}
 		}).register("MINING_STONE");
-		
-//		new Challenge("Harvest Slimefun Plants", "Find a plant from ExoticGarden and haverst it.", new int[]{1}, new ChallengeHandler() {
-//			public boolean onInteract(PlayerInteractEvent e) {
-//				return ExoticGarden.harvestPlant(e.getClickedBlock()) != null;
-//			}
-//		}).register("HARVEST_SLIMEFUN_PLANT");
 		
 		new Challenge("Earn %amount% Emeralds", "Trade with Villagers to obtain emeralds!", new int[]{4,6,8,10,12,14}, new ChallengeHandler() {
 
