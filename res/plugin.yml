@@ -1,0 +1,11 @@
+name: DailyChallengesAmeliorate
+version: 1.0
+author: ipodtouch0218
+
+main: net.iccraft.dca.DCAMain
+commands:
+  dailychallenges:
+    usage: /<command>
+    description: Opens the Daily Challenges GUI
+    aliases: [dc,challenges,chal,challenge]
+    
